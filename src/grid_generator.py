@@ -36,8 +36,17 @@ def main():
     args = parse_args()
     pts = make_grid(args.nx, args.ny, args.nz)
     show_points(pts)
+    print(pts)
+    print(pts.shape)
     plt.show()
 
 
 if __name__ == "__main__":
     main()
+    
+    
+'''
+Pour tester (depuis le répertoire imagerie_medicale_tp2) :
+python ./src/grid_generator.py
+python ./src/grid_generator.py --nx 10 --ny 10 --nz 5
+'''
