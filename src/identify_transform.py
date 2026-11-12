@@ -20,32 +20,27 @@ M3 = np.array([[ 0.7182, -1.3727, -0.5660, 1.8115],
 
 
 def classify(M, tol=TOL):
+    # Verdict automatique d'après la diapo "Transformations rigides 3D" (à utiliser comme contrôle)
     A = M[:3, :3]
-    s = np.linalg.svd(A, compute_uv=False)
-    det = np.linalg.det(A)
+    s = np.linalg.svd(A, compute_uv=False)   # valeurs singulières v1, v2, v3 (diagonale de S)
 
-    if not np.allclose(M[3], [0, 0, 0, 1], atol=tol):
-        return "pas une transformation affine (dernière ligne différente de 0 0 0 1)"
-    if not np.allclose(s, s[0], atol=tol):
-        return "affine générale (valeurs singulières différentes)"
-
-    d = s.mean()
-    suffixe = "" if det > 0 else " avec réflexion (det < 0)"
-    if np.isclose(d, 1, atol=tol):
-        return "rigide" + suffixe
-    return f"similitude de rapport d = {d:.4f}" + suffixe
+    if np.allclose(s, 1, atol=tol):
+        return "rigide : S = identité"
+    if np.allclose(s, s[0], atol=tol):
+        return f"rigide avec homothétie de rapport d = {s.mean():.4f} : S = d * identité"
+    
+    return "affine générale : valeurs singulières différentes"
 
 
 def diagnostic(M, nom):
-    A = M[:3, :3]   # bloc 3x3
-    t = M[:3, 3]    # translation
-    s = np.linalg.svd(A, compute_uv=False)   # valeurs singulières (sans U ni V*)
+    A = M[:3, :3]   # bloc 3x3 en haut à gauche
+    t = M[:3, 3]    # translation (p, q, r)
+    s = np.linalg.svd(A, compute_uv=False)
 
     print(f"--- {nom} ---")
+    print(M)
     print("dernière ligne :", M[3])
     print("translation t :", t)
-    print("A.T @ A :")
-    print(np.round(A.T @ A, 3))
     print("valeurs singulières :", np.round(s, 4))
     print("déterminant de A :", round(np.linalg.det(A), 4))
     print("verdict :", classify(M))
